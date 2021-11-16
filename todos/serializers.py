@@ -9,3 +9,12 @@ class TodoSerializer(serializers.HyperlinkedModelSerializer):
         model = Todo
         # the fields that should be included in the serialized output
         fields = ['id', 'subject', 'details']
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'email')
+
+class TokenSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=255)

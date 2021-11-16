@@ -23,7 +23,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from todos.views import TodoViewSet
+from todos.views import TodoViewSet, LoginView
+from rest_framework_simplejwt import views as jwt_views
+
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+# serializers.py
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['username'] = user.username
+        token['email'] = user.email
+
+        return token
+
+# views.py
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 # create a new router
 router = routers.DefaultRouter()
@@ -33,5 +54,12 @@ router.register(r'todos', TodoViewSet)  #register "/todos" routes
 urlpatterns = [
     # add all of our router urls
     path('', include(router.urls)),
+    path('api/token/',
+         MyTokenObtainPairView.as_view(),
+         name='token_obtain_pair'),
+    path('api/token/refresh/',
+         jwt_views.TokenRefreshView.as_view(),
+         name='token_refresh'),
+    path('user/login/', LoginView.as_view(), name="auth-login"),
     path('admin/', admin.site.urls),
 ]
