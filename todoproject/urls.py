@@ -21,7 +21,8 @@ Including another URLconf
 # ]
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, re_path, include
+from django.views.generic import TemplateView
 from rest_framework import routers
 from todos.views import TodoViewSet, LoginView
 from rest_framework_simplejwt import views as jwt_views
@@ -62,4 +63,6 @@ urlpatterns = [
          name='token_refresh'),
     path('user/login/', LoginView.as_view(), name="auth-login"),
     path('admin/', admin.site.urls),
+    re_path('(^(?!(api|admin)).*$)',
+            TemplateView.as_view(template_name='index.html'))
 ]
